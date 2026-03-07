@@ -17,8 +17,10 @@
 
         <script>
 
-                if (document.cookie.includes("watched=true")){
+                let video = document.getElementById("levVideo")
 
+                if (document.cookie.includes("watched=true")){
+                        vidoe.remove();
                         alert("You've watched");
 
                 }
@@ -26,6 +28,7 @@
                 document.getElementById("levVideo").addEventListener("ended",function (){
 
                         document.cookie = "watched=true; path=/; max-age =" + (60 * 60 * 24);
+                        idoe.remove();
                         alert("video watched! cookie set")
 
                 });
