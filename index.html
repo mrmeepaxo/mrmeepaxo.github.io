@@ -20,15 +20,21 @@
                 let video = document.getElementById("levVideo")
 
                 if (document.cookie.includes("watched=true")){
-                        vidoe.remove();
+                        vidoe.pause();
+                        video.remove();
+                        video.controls = false;
                         alert("You've watched");
 
                 }
 
+                
+
                 document.getElementById("levVideo").addEventListener("ended",function (){
 
-                        document.cookie = "watched=true; path=/; max-age =" + (60 * 60 * 24);
-                        idoe.remove();
+                        document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
+                        vidoe.pause();
+                        video.remove();
+                        video.controls = false;
                         alert("video watched! cookie set")
 
                 });
