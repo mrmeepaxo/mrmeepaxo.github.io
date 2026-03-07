@@ -9,12 +9,29 @@
 
 <body>
 
-    <video id = "levVideo" width="320" height="240" controls>
+        <video id = "levVideo" width="320" height="240" controls>
 
-        <source src = "videoplayback.mp4" type = "video/mp4">
+                <source src = "videoplayback.mp4" type = "video/mp4">
+        
+        </video>
+
+        <script>
+
+                if (document.cookie.includes("watched=true")){
+
+                        alert("You've watched");
+
+                }
+
+                document.getElementById("levVideo").addEventListener("ended",function (){
+
+                        document.cookie = "watched=true; path=/; max-age =" + (60 * 60 * 24);
+                        alert("video watched! cookie set")
+
+                });
+
+        </script>
 
 </body>
-
-
 
 </html>
