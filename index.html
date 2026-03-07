@@ -21,7 +21,6 @@
 
                 if (document.cookie.includes("watched=true")){
                         vidoe.pause();
-                        video.remove();
                         video.controls = false;
                         alert("You've watched");
 
@@ -33,7 +32,6 @@
 
                         document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
                         vidoe.pause();
-                        video.remove();
                         video.controls = false;
                         alert("video watched! cookie set")
 
