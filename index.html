@@ -52,15 +52,18 @@
 
                 if (document.cookie.includes("watched=true")){
                         video.remove();
-                        alert("You've watched");
-
+                        let message = document.createElement("h1");
+                        message.textContent = "Finished watching";
+                        document.body.appendChild(message);
                 }
 
                 document.getElementById("levVideo").addEventListener("ended",function (){
 
                         document.cookie = "watched=true; path=/; max-age =" + (60 * 60 * 24);
                         video.remove();
-                        alert("video watched! cookie set")
+                        let message = document.createElement("h1");
+                        message.textContent = "You've already watched the video!";
+                        document.body.appendChild(message);
 
                 });
 
