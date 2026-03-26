@@ -1,74 +1,101 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Lev's Video</title>
 
-        <title> Lev's Video CLICK PLAY </title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
 
-        <style>
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-               body{
-                        margin:0;
-                        background-color:#1e1e1e;   
-                        color:white;
-                        text-align:center;          
-                        font-family:Arial;
-                }
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
 
-                header{
-                        background-color:#111;
-                        color:white;
-                        padding:20px;
-                }
+        .video-container {
+            background: #111;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.6);
+        }
 
-                video{
-                        margin-top:60px;            
-                        width:800px;               
-                        max-width:90%;              
-                }
-                                
+        video {
+            width: 800px;
+            max-width: 90vw;
+            border-radius: 8px;
+        }
 
-        </style>
-
+        .message {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            color: #ff6b6b;
+        }
+    </style>
 </head>
 
 <body>
 
-        <header>
-        
-                <h1>Disappearing video after you watch</h1>
+    <header>
+        <h1>🎬 Watch Carefully… You Only Get Two Plays</h1>
+    </header>
 
-        </header>
-
-        <video id = "levVideo" width="320" height="240" controls>
-
-                <source src = "videoplayback.mp4" type = "video/mp4">
-        
+    <div class="video-container" id="videoWrapper">
+        <video id="levVideo" controls>
+            <source src="videoplayback.mp4" type="video/mp4">
         </video>
+    </div>
 
-        <script>
+    <div id="message"></div>
 
-                let video = document.getElementById("levVideo")
+    <script>
+        const video = document.getElementById("levVideo");
+        const wrapper = document.getElementById("videoWrapper");
+        const messageDiv = document.getElementById("message");
 
-                if (document.cookie.includes("watched=true")){
-                        video.remove();
-                        let message = document.createElement("h1");
-                        message.textContent = "You've already watched the video!";
-                        document.body.appendChild(message);
-                }
+        // Check cookie
+        if (document.cookie.includes("watched=true")) {
+            wrapper.remove();
+            showMessage("🚫 You've already watched the video twice!");
+        }
 
-                document.getElementById("levVideo").addEventListener("ended",function (){
+        let playCount = 0;
 
-                        document.cookie = "watched=true; path=/; max-age =" + (60 * 60 * 24);
-                        video.remove();
-                        let message = document.createElement("h1");
-                        message.textContent = "Finished watching";
-                        document.body.appendChild(message);
+        video.addEventListener("ended", function () {
+            playCount++;
 
-                });
+            if (playCount < 2) {
+                // Replay automatically
+                video.currentTime = 0;
+                video.play();
+            } else {
+                // Block after second play
+                document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
 
-        </script>
+                wrapper.remove();
+                showMessage("✅ You've finished both views. No more replays!");
+            }
+        });
+
+        function showMessage(text) {
+            messageDiv.textContent = text;
+            messageDiv.classList.add("message");
+        }
+    </script>
 
 </body>
-
 </html>
