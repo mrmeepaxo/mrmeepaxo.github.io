@@ -42,7 +42,7 @@
         box-shadow: 0 0 25px rgba(0,0,0,0.6);
     }
 
-    iframe {
+    #player {
         width: 800px;
         max-width: 90vw;
         height: 450px;
@@ -68,22 +68,16 @@
 
 <div class="main-content">
     <div class="video-container" id="videoWrapper">
-
-        <iframe
-            id="levVideo"
-            src="https://www.youtube.com/embed/7EkpC1RTnyY"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
-        </iframe>
-
+        <div id="player"></div>
     </div>
 
     <div id="message"></div>
 </div>
 
 <script>
+    let player;
+    let playCount = 0;
+
     const wrapper = document.getElementById("videoWrapper");
     const messageDiv = document.getElementById("message");
 
@@ -92,17 +86,46 @@
         messageDiv.classList.add("message");
     }
 
-    // If already watched
+    // Cookie check
     if (document.cookie.includes("watched=true")) {
         wrapper.remove();
-        showMessage("You've already watched the video!");
+        showMessage("You already watched the video!");
     } else {
-        // When user clicks video → mark as watched
-        const iframe = document.getElementById("levVideo");
 
-        iframe.addEventListener("click", function () {
-            document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
-        });
+        // Load YouTube API
+        let tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.body.appendChild(tag);
+
+        window.onYouTubeIframeAPIReady = function () {
+            player = new YT.Player('player', {
+                videoId: '7EkpC1RTnyY',
+                playerVars: {
+                    autoplay: 1,
+                    mute: 1,
+                    controls: 1
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        };
+
+        function onPlayerStateChange(event) {
+            // 0 = ended
+            if (event.data === 0) {
+                playCount++;
+
+                if (playCount < 2) {
+                    player.seekTo(0);
+                    player.playVideo();
+                } else {
+                    document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
+                    wrapper.remove();
+                    showMessage("You already watched the video!");
+                }
+            }
+        }
     }
 </script>
 ```
