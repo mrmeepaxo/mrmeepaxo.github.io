@@ -35,11 +35,14 @@
         padding: 50px 20px;
     }
 
-    .video-container {
+    .video-container,
+    .second-part {
         background: #111;
         padding: 20px;
         border-radius: 12px;
         box-shadow: 0 0 25px rgba(0,0,0,0.6);
+        width: fit-content;
+        max-width: 90vw;
     }
 
     #player {
@@ -53,6 +56,12 @@
         margin-top: 30px;
         font-size: 1.5rem;
         color: #ff6b6b;
+    }
+
+    .second-part {
+        display: none;
+        margin-top: 20px;
+        color: white;
     }
 </style>
 ```
@@ -72,57 +81,74 @@
     </div>
 
     <div id="message"></div>
+
+    <div class="second-part" id="secondPart">
+        <h2>Second Part</h2>
+        <p>You already watched the video.</p>
+        <p>Put your second content here.</p>
+    </div>
 </div>
 
 <script>
     let player;
-    let playCount = 0;
+    let endCount = 0;
 
     const wrapper = document.getElementById("videoWrapper");
     const messageDiv = document.getElementById("message");
+    const secondPart = document.getElementById("secondPart");
 
     function showMessage(text) {
         messageDiv.textContent = text;
         messageDiv.classList.add("message");
     }
 
-    // Cookie check
+    // If already watched before
     if (document.cookie.includes("watched=true")) {
-        wrapper.remove();
-        showMessage("You already watched the video!");
+        wrapper.style.display = "none";
+        showMessage("You already watched video.");
+        secondPart.style.display = "block";
     } else {
-
         // Load YouTube API
-        let tag = document.createElement('script');
+        const tag = document.createElement("script");
         tag.src = "https://www.youtube.com/iframe_api";
         document.body.appendChild(tag);
 
         window.onYouTubeIframeAPIReady = function () {
-            player = new YT.Player('player', {
-                videoId: '7EkpC1RTnyY',
+            player = new YT.Player("player", {
+                videoId: "7EkpC1RTnyY",
                 playerVars: {
                     autoplay: 1,
                     mute: 1,
-                    controls: 1
+                    controls: 1,
+                    rel: 0,
+                    playsinline: 1
                 },
                 events: {
-                    'onStateChange': onPlayerStateChange
+                    onReady: onPlayerReady,
+                    onStateChange: onPlayerStateChange
                 }
             });
         };
 
-        function onPlayerStateChange(event) {
-            // 0 = ended
-            if (event.data === 0) {
-                playCount++;
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
 
-                if (playCount < 2) {
+        function onPlayerStateChange(event) {
+            // YT.PlayerState.ENDED === 0
+            if (event.data === YT.PlayerState.ENDED) {
+                endCount++;
+
+                if (endCount === 1) {
+                    // Play second time
                     player.seekTo(0);
                     player.playVideo();
-                } else {
+                } else if (endCount === 2) {
+                    // After second full watch
                     document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
-                    wrapper.remove();
-                    showMessage("You already watched the video!");
+                    wrapper.style.display = "none";
+                    showMessage("You already watched video.");
+                    secondPart.style.display = "block";
                 }
             }
         }
