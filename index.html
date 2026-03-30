@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lev's Video</title>
 
 ```
@@ -83,15 +84,15 @@
     <div id="message"></div>
 
     <div class="second-part" id="secondPart">
-        <h2>Second Part</h2>
-        <p>You already watched the video.</p>
-        <p>Put your second content here.</p>
+        <h2>You already watched the video</h2>
+        <p>This is your second part.</p>
     </div>
 </div>
 
 <script>
     let player;
     let endCount = 0;
+    let hasStarted = false;
 
     const wrapper = document.getElementById("videoWrapper");
     const messageDiv = document.getElementById("message");
@@ -102,13 +103,18 @@
         messageDiv.classList.add("message");
     }
 
-    // If already watched before
+    function finishVideoFlow() {
+        document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
+        wrapper.style.display = "none";
+        showMessage("You already watched video.");
+        secondPart.style.display = "block";
+    }
+
     if (document.cookie.includes("watched=true")) {
         wrapper.style.display = "none";
         showMessage("You already watched video.");
         secondPart.style.display = "block";
     } else {
-        // Load YouTube API
         const tag = document.createElement("script");
         tag.src = "https://www.youtube.com/iframe_api";
         document.body.appendChild(tag);
@@ -124,34 +130,28 @@
                     playsinline: 1
                 },
                 events: {
-                    onReady: onPlayerReady,
-                    onStateChange: onPlayerStateChange
+                    onReady: function (event) {
+                        event.target.playVideo();
+                    },
+                    onStateChange: function (event) {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            hasStarted = true;
+                        }
+
+                        if (event.data === YT.PlayerState.ENDED && hasStarted) {
+                            endCount++;
+
+                            if (endCount === 1) {
+                                player.seekTo(0);
+                                player.playVideo();
+                            } else if (endCount >= 2) {
+                                finishVideoFlow();
+                            }
+                        }
+                    }
                 }
             });
         };
-
-        function onPlayerReady(event) {
-            event.target.playVideo();
-        }
-
-        function onPlayerStateChange(event) {
-            // YT.PlayerState.ENDED === 0
-            if (event.data === YT.PlayerState.ENDED) {
-                endCount++;
-
-                if (endCount === 1) {
-                    // Play second time
-                    player.seekTo(0);
-                    player.playVideo();
-                } else if (endCount === 2) {
-                    // After second full watch
-                    document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
-                    wrapper.style.display = "none";
-                    showMessage("You already watched video.");
-                    secondPart.style.display = "block";
-                }
-            }
-        }
     }
 </script>
 ```
