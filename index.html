@@ -6,14 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lev's Video</title>
 
-```
 <style>
     body {
         margin: 0;
         background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
         color: white;
         text-align: center;
-        font-family: Arial, sans-serif;
+        font-family: "Times New Roman", Times, serif; /* changed font */
     }
 
     header {
@@ -55,8 +54,31 @@
 
     .message {
         margin-top: 30px;
-        font-size: 1.5rem;
-        color: #ff6b6b;
+        font-size: 1.2rem;
+        color: #ffffff;
+    }
+
+    /* Windows error style */
+    .error-box {
+        margin-top: 30px;
+        background: #c0c0c0;
+        border: 2px solid #000;
+        width: 350px;
+        text-align: left;
+        font-family: "Times New Roman", Times, serif;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    .error-title {
+        background: #000080;
+        color: white;
+        padding: 5px;
+        font-weight: bold;
+    }
+
+    .error-content {
+        padding: 15px;
+        color: black;
     }
 
     .second-part {
@@ -65,15 +87,13 @@
         color: white;
     }
 </style>
-```
 
 </head>
 
 <body>
 
-```
 <header>
-    <h1>Disappearing video after you watch</h1>
+    <h1>Welcome</h1> <!-- changed text -->
 </header>
 
 <div class="main-content">
@@ -98,21 +118,28 @@
     const messageDiv = document.getElementById("message");
     const secondPart = document.getElementById("secondPart");
 
-    function showMessage(text) {
-        messageDiv.textContent = text;
-        messageDiv.classList.add("message");
+    function showError() {
+        messageDiv.innerHTML = `
+            <div class="error-box">
+                <div class="error-title">Error</div>
+                <div class="error-content">
+                    This video cannot be played again.<br><br>
+                    Please restart your system or contact support.
+                </div>
+            </div>
+        `;
     }
 
     function finishVideoFlow() {
         document.cookie = "watched=true; path=/; max-age=" + (60 * 60 * 24);
         wrapper.style.display = "none";
-        showMessage("You already watched video.");
+        showError(); /* windows-style error */
         secondPart.style.display = "block";
     }
 
     if (document.cookie.includes("watched=true")) {
         wrapper.style.display = "none";
-        showMessage("You already watched video.");
+        showError();
         secondPart.style.display = "block";
     } else {
         const tag = document.createElement("script");
@@ -154,7 +181,6 @@
         };
     }
 </script>
-```
 
 </body>
 </html>
